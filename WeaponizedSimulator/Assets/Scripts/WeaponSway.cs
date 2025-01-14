@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class WeaponSway : MonoBehaviour
@@ -7,11 +6,12 @@ public class WeaponSway : MonoBehaviour
     [Header("Sway Settings")]
     [SerializeField] private float smooth;
     [SerializeField] private float multiplier;
-    void Update()
+
+    private void Update()
     {
         //mouse input
-        float mouseX = Input.GetAxisRaw("Mouse X") + multiplier;
-        float mouseY = Input.GetAxisRaw("Mouse Y") + multiplier;
+        float mouseX = Input.GetAxisRaw("Mouse X") * multiplier;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * multiplier;
 
         // calculate targe rotation
         Quaternion rotationX = Quaternion.AngleAxis(-mouseY, Vector3.right);

@@ -5,25 +5,47 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] GunData gunData;
+    [SerializeField] private GunData gunData;
+    [SerializeField] private Transform muzzle;
 
     float timeSinceLastShot;
 
     private void Start()
     {
         PlayerShoot.shootInput += Shoot;
+        PlayerShoot.reloadInput += StartReload;
     }
+
+    public void StartReload()
+    {
+        if(!gunData.reloading)
+        {
+            StartCoroutine(Reload());
+        }
+    }
+
+    private IEnumerator Reload()
+    {
+        gunData.reloading = true;
+
+        yield return new WaitForSeconds(gunData.reloadTime);
+
+        gunData.currentAmmo = gunData.magSize;
+
+        gunData.reloading = false;
+    }
+
 
     private bool CanShoot() => !gunData.reloading && timeSinceLastShot > 1f / (gunData.fireRate / 60f);
 
-    public void Shoot()
+    private void Shoot()
     {
         if (gunData.currentAmmo > 0)
         {
+            Debug.Log("Shoot");
             if (CanShoot())
             {
-                Debug.Log("Can Shoot");
-                if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, gunData.maxDistance))
+                if(Physics.Raycast(muzzle.position, transform.forward, out RaycastHit hitInfo, gunData.maxDistance))
                 {
                     Debug.Log(hitInfo.transform.name);
                 }
@@ -35,13 +57,17 @@ public class Gun : MonoBehaviour
         }
     }
 
-    private void Updaate()
+    private void Update()
     {
         timeSinceLastShot += Time.deltaTime;
+
+        Debug.DrawRay(muzzle.position, muzzle.forward,Color.red);
     }
 
     private void OnGunShot()
     {
-        // Add gun shot effects here
+        // Play gun shot sound
+        // Play gun shot animation
+        // Play gun shot particle effect
     }
 }
